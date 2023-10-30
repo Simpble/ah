@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.shiep.mapper.IReportMapper">  <!--绑定mapper-->
+    <select id="queryReport" resultType="com.shiep.entity.Report">
+        select id, title, content, sa_city_id as cityId, create_time, update_time , verify_status, delete_status,
+        sa_report_type_id as typeId, sa_user_id as userId FROM sa_report
+        <where>
+            <if test="cityId != null">
+                and sa_city_id = #{cityId}
+            </if>
+            <if test="typeId != null">
+                and sa_report_type_id = #{typeId}
+            </if>
+            and delete_status = 0 and verify_status = 1
+        </where>
+    </select>
+
+    <select id="queryReportInDay" resultType="com.shiep.entity.Report">
+        select id, title, content, sa_city_id as cityId, create_time, update_time , verify_status, delete_status,
+        sa_report_type_id as typeId, sa_user_id as userId FROM sa_report
+        <where>
+            <if test="cityId != null">
+                and sa_city_id = #{cityId}
+            </if>
+            <if test="typeId != null">
+                and sa_report_type_id = #{typeId}
+            </if>
+            and delete_status = 0 and DATE_FORMAT(create_time,'%Y-%m-%d') = curdate() and verify_status = 1
+        </where>
+    </select>
+
+    <select id="queryReportInWeek" resultType="com.shiep.entity.Report">
+        select id, title, content, sa_city_id as cityId, create_time, update_time , verify_status, delete_status,
+        sa_report_type_id as typeId, sa_user_id as userId FROM sa_report
+        <where>
+            <if test="cityId != null">
+                and sa_city_id = #{cityId}
+            </if>
+            <if test="typeId != null">
+                and sa_report_type_id = #{typeId}
+            </if>
+            and delete_status = 0 and create_time > NOW() - INTERVAL 1 WEEK and verify_status = 1
+        </where>
+    </select>
+
+    <select id="queryReportInMonth" resultType="com.shiep.entity.Report">
+        select id, title, content, sa_city_id as cityId, create_time, update_time , verify_status, delete_status,
+        sa_report_type_id as typeId, sa_user_id as userId FROM sa_report
+        <where>
+            <if test="cityId != null">
+                and sa_city_id = #{cityId}
+            </if>
+            <if test="typeId != null">
+                and sa_report_type_id = #{typeId}
+            </if>
+            and delete_status = 0 and create_time > NOW() - INTERVAL 1 MONTH and verify_status = 1
+        </where>
+    </select>
+
+
+</mapper>
