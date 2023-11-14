@@ -10,13 +10,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
+
 /**
  * Redis工具类
  */
-@Component
 public final class RedisUtil {
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    public RedisTemplate<String,Object> redisTemplate;
+
+    public RedisUtil(RedisTemplate<String,Object> redisTemplate){
+        this.redisTemplate = redisTemplate;
+    }
 
     /**
      * 指定缓存失效时间
@@ -25,7 +29,7 @@ public final class RedisUtil {
      * @param time 时间(秒)
      * @return
      */
-    public boolean expire(String key, long time) {
+    public boolean expireOfSeconds(String key, long time) {
         try {
             if (time > 0) {
                 redisTemplate.expire(key, time, TimeUnit.SECONDS);
@@ -37,13 +41,27 @@ public final class RedisUtil {
         }
     }
 
+
+    public boolean expireOfMinutes(String key, long time) {
+        try {
+            if (time > 0) {
+                redisTemplate.expire(key, time, TimeUnit.MINUTES);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * 根据key 获取过期时间
+     *
      * @param key 键 不能为null
      * @return 时间(秒) 返回0代表为永久有效
      */
     public long getExpire(String key) {
-        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+        return hasKey(key) ? redisTemplate.getExpire(key, TimeUnit.SECONDS) : -1;
     }
 
     /**
@@ -54,7 +72,8 @@ public final class RedisUtil {
      */
     public boolean hasKey(String key) {
         try {
-            return redisTemplate.hasKey(key);
+            /*使用redisTemplate判断key存在为什么会出现null的情况！*/
+            return Boolean.TRUE.equals(redisTemplate.hasKey(key));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -63,6 +82,7 @@ public final class RedisUtil {
 
     /**
      * 删除缓存
+     *
      * @param key 可以传一个值 或多个
      */
     public void del(String... key) {
@@ -78,6 +98,7 @@ public final class RedisUtil {
 
     /**
      * 普通缓存获取
+     *
      * @param key 键
      * @return 值
      */
@@ -87,6 +108,7 @@ public final class RedisUtil {
 
     /**
      * 普通缓存放入
+     *
      * @param key   键
      * @param value 值
      * @return true成功 false失败
@@ -103,15 +125,29 @@ public final class RedisUtil {
 
     /**
      * 普通缓存放入并设置时间
+     *
      * @param key   键
      * @param value 值
-     * @param time  时间(秒) time要大于0 如果time小于等于0 将设置无限期
+     * @param time  时间(秒) time要大于0,时间小于0设置失败
      * @return true成功 false 失败
      */
-    public boolean set(String key, Object value, long time) {
+    public boolean setOfSeconds(String key, Object value, long time) {
         try {
             if (time > 0) {
                 redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean setOfMinutes(String key, Object value, long time) {
+        try {
+            if (time > 0) {
+                redisTemplate.opsForValue().set(key, value, time, TimeUnit.MINUTES);
             } else {
                 set(key, value);
             }
@@ -124,6 +160,7 @@ public final class RedisUtil {
 
     /**
      * 递增
+     *
      * @param key   键
      * @param delta 要增加几(大于0)
      * @return
@@ -162,23 +199,21 @@ public final class RedisUtil {
     }
 
     /**
-     * 获取hashKey对应的所有键值
-     *
+     * 获取hashKey对应的所有键
      * @param key 键
      * @return 对应的多个键值
      */
-    public Map<Object, Object> hmget(String key) {
+    public Map<Object, Object> hget(String key) {
         return redisTemplate.opsForHash().entries(key);
     }
 
     /**
      * HashSet
-     *
      * @param key 键
      * @param map 对应多个键值
      * @return true 成功 false 失败
      */
-    public boolean hmset(String key, Map<String, Object> map) {
+    public boolean hset(String key, Map<String, Object> map) {
         try {
             redisTemplate.opsForHash().putAll(key, map);
             return true;
@@ -196,11 +231,11 @@ public final class RedisUtil {
      * @param time 时间(秒)
      * @return true成功 false失败
      */
-    public boolean hmset(String key, Map<String, Object> map, long time) {
+    public boolean hsetOfSeconds(String key, Map<String, Object> map, long time) {
         try {
             redisTemplate.opsForHash().putAll(key, map);
             if (time > 0) {
-                expire(key, time);
+                expireOfSeconds(key, time);
             }
             return true;
         } catch (Exception e) {
@@ -240,7 +275,7 @@ public final class RedisUtil {
         try {
             redisTemplate.opsForHash().put(key, item, value);
             if (time > 0) {
-                expire(key, time);
+                expireOfSeconds(key, time);
             }
             return true;
         } catch (Exception e) {
@@ -353,7 +388,7 @@ public final class RedisUtil {
         try {
             Long count = redisTemplate.opsForSet().add(key, values);
             if (time > 0)
-                expire(key, time);
+                expireOfSeconds(key, time);
             return count;
         } catch (Exception e) {
             e.printStackTrace();
@@ -471,7 +506,7 @@ public final class RedisUtil {
         try {
             redisTemplate.opsForList().rightPush(key, value);
             if (time > 0)
-                expire(key, time);
+                expireOfSeconds(key, time);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -508,7 +543,7 @@ public final class RedisUtil {
         try {
             redisTemplate.opsForList().rightPushAll(key, value);
             if (time > 0)
-                expire(key, time);
+                expireOfSeconds(key, time);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

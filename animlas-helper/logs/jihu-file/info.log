@@ -1,0 +1,11 @@
+22:13:40.246 [restartedMain] INFO  c.s.StaryAnimalsApplication - [logStarting,50] - Starting StaryAnimalsApplication on theAning-computer with PID 17508 (D:\developmentSoftWare\project\ac\animlas-helper\target\classes started by theAning in D:\developmentSoftWare\project\ac\animlas-helper)
+22:13:40.247 [restartedMain] INFO  c.s.StaryAnimalsApplication - [logStartupProfileInfo,675] - No active profile set, falling back to default profiles: default
+22:13:41.270 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-80"]
+22:13:41.275 [restartedMain] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+22:13:41.275 [restartedMain] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.19]
+22:13:41.321 [restartedMain] INFO  o.a.c.c.C.[.[.[/stary-animals] - [log,173] - Initializing Spring embedded WebApplicationContext
+22:13:41.453 [restartedMain] INFO  c.a.d.p.DruidDataSource - [init,1003] - {dataSource-1} inited
+22:13:42.105 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-80"]
+22:13:42.117 [restartedMain] INFO  c.s.StaryAnimalsApplication - [logStarted,59] - Started StaryAnimalsApplication in 2.067 seconds (JVM running for 2.687)
+22:13:57.211 [Thread-12] INFO  c.a.d.p.DruidDataSource - [close,1948] - {dataSource-1} closing ...
+22:13:57.212 [Thread-12] INFO  c.a.d.p.DruidDataSource - [close,2020] - {dataSource-1} closed
